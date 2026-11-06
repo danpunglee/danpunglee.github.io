@@ -297,3 +297,6 @@ a.card:hover{border-color:var(--border-input);text-decoration:none;box-shadow:0 
 .shots{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:1.5rem 0 2rem}
 .shots img{display:block;width:100%;border-radius:16px;border:1px solid var(--border-soft)}
 @media (max-width:600px){.shots{gap:8px}.shots img{border-radius:10px}}
+
+/* ===== 프로젝트 페이지: 목록 아래(수정 링크·이전/다음) 숨김 ===== */
+.docs[data-doc="projects"] .doc-footer,.docs[data-doc="projects"] .pagination-nav{display:none}
