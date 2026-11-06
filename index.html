@@ -166,19 +166,9 @@ const FEATURE_ICON = [
 ];
 
 function renderHome(){
-  app.innerHTML = `
-<main class="home">
-  <section class="home__hero">
-    <h1>danpunglee docs</h1>
-    <p>만들고, 기록하고, 나눕니다. 프로젝트와 기술 노트를 문서처럼 정리해 두는 공간입니다.</p>
-    <div class="home__actions"><a class="cta" href="#/docs/intro">시작하기</a><a class="out-btn" href="https://github.com/danpunglee" target="_blank" rel="noopener">GitHub</a></div>
-  </section>
-  <section class="home__grid">
-    <a class="feature" href="#/docs/projects"><div class="feature__icon">${FEATURE_ICON[0]}</div><h3>프로젝트</h3><p>직접 만든 도구와 서비스를 공개하고, 진행 상황을 한곳에서 보여 줍니다.</p></a>
-    <a class="feature" href="#/docs/notes"><div class="feature__icon">${FEATURE_ICON[1]}</div><h3>기술 노트</h3><p>작업하며 배운 것과 문제 해결 과정을 찾기 쉬운 문서로 남깁니다.</p></a>
-    <a class="feature" href="#/docs/site"><div class="feature__icon">${FEATURE_ICON[2]}</div><h3>열린 기록</h3><p>모든 내용은 GitHub에 공개되어 누구나 보고 의견을 남길 수 있습니다.</p></a>
-  </section>
-</main>`;
+  // 메인 페이지: 저장소 루트의 dog.jpg 를 화면 가운데에 표시
+  app.innerHTML = `<main class="photo"><img src="dog.jpg" alt="강아지 사진"></main>`;
+  app.querySelector(".photo img").onerror = e => { e.target.outerHTML = '<p class="photo__empty">강아지 사진 준비 중</p>'; };
   setActiveNav(null);
   document.title = "danpunglee";
 }

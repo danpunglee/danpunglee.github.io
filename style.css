@@ -274,3 +274,14 @@ a.card:hover{border-color:var(--border-input);text-decoration:none;box-shadow:0 
   .pagination-nav{grid-template-columns:1fr}
   .pagination-nav__link--next{grid-column:1}
 }
+
+/* ===== 모든 메뉴 숨김 (상단 · 사이드바 · 푸터) ===== */
+:root{--nav-h:0px !important}
+.navbar,.sidebar,.backdrop,.footer{display:none !important}
+.docs{padding:0 !important;min-height:100vh}
+.main{padding:1rem 24px 0 !important}
+
+/* ===== 메인: 강아지 사진 ===== */
+.photo{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.photo img{display:block;max-width:100%;max-height:calc(100vh - 48px);object-fit:contain;border-radius:12px}
+.photo__empty{color:var(--text-faint);font-size:1rem}
