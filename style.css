@@ -13,7 +13,7 @@
    ========================================================== */
 /* ---------- Tokens ---------- */
 :root{
-  --bg:#fff6ef; --bg-nav:#fff6ef; --bg-subtle:#f8f9fc; --bg-hover:#f1f2f8; --bg-active:#e0e3f2;
+  --bg:#ffffff; --bg-nav:#ffffff; --bg-subtle:#f8f9fc; --bg-hover:#f1f2f8; --bg-active:#e0e3f2;
   --text:#242736; --text-strong:#242836; --text-muted:#3f475d; --text-faint:#6e758a;
   --border:#dadde1; --border-soft:#e7e9f0; --border-input:#d0d5e9;
   --link:#1471eb; --btn-bg:#242736; --btn-text:#ffffff;
@@ -50,8 +50,8 @@ svg{flex-shrink:0}
 .navbar{position:sticky;top:0;z-index:50;background:var(--bg-nav)}
 .navbar__row{display:flex;align-items:center;gap:.5rem;height:var(--nav-row);max-width:1536px;margin:0 auto;padding:0 60px}
 .navbar__row--top{position:relative}
-.navbar__brand{display:flex;align-items:center;gap:.45rem;color:var(--text-strong);font-weight:700;font-size:1.3rem;letter-spacing:-.02em}
-.navbar__brand:hover{text-decoration:none;color:var(--text-strong)}
+.navbar__brand{display:flex;align-items:center;gap:.45rem;color:#f37021;font-weight:700;font-size:1.3rem;letter-spacing:-.02em}
+.navbar__brand:hover{text-decoration:none;color:#f37021}
 .navbar__brand svg{width:30px;height:30px}
 .navbar__brand .light{font-weight:400}
 .navbar__center{position:absolute;left:50%;transform:translateX(-50%);display:flex;gap:.75rem}
