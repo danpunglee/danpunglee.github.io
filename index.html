@@ -205,9 +205,6 @@ async function renderDoc(id){
       </ul></nav>
       <details class="toc-mobile"><summary>이 페이지의 내용</summary><div class="toc" id="tocMobile"></div></details>
       <article class="markdown" id="article"><p class="md-loading">불러오는 중…</p></article>
-      <div class="doc-footer">
-        <a href="${REPO}/edit/main/docs/${id}.md" target="_blank" rel="noopener"><svg viewBox="0 0 40 40"><path d="m34.5 11.7-3 3.1-6.3-6.3 3.1-3q.5-.5 1.2-.5t1.1.5l3.9 3.9q.5.4.5 1.1t-.5 1.2zm-29.5 17.1 18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"/></svg>이 페이지 수정하기</a>
-      </div>
       <nav class="pagination-nav" aria-label="문서 페이지">
         ${prev ? `<a class="pagination-nav__link pagination-nav__link--prev" href="#/docs/${prev}"><span class="pagination-nav__sub">이전</span><span class="pagination-nav__label">${esc(TITLES[prev])}</span></a>` : ""}
         ${next ? `<a class="pagination-nav__link pagination-nav__link--next" href="#/docs/${next}"><span class="pagination-nav__sub">다음</span><span class="pagination-nav__label">${esc(TITLES[next])}</span></a>` : ""}
