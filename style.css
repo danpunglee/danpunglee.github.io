@@ -192,6 +192,14 @@ a.card:hover{border-color:var(--border-input);text-decoration:none;box-shadow:0 
 .pagination-nav__link--prev .pagination-nav__label::before{content:"‹ "}
 .pagination-nav__link--next .pagination-nav__label::after{content:" ›"}
 
+.markdown pre{margin:0 0 20px;padding:1rem 1.2rem;background:var(--bg-subtle);border:1px solid var(--border-soft);border-radius:8px;overflow:auto;line-height:1.5}
+.markdown pre code{background:none;border:0;padding:0;font-size:.85rem}
+.markdown kbd{font-family:var(--font);font-size:.8em;display:inline-block;min-width:1.6em;padding:0 .35em;text-align:center;border:1px solid var(--border-input);border-bottom-width:2px;border-radius:4px;background:var(--bg);color:var(--text-muted)}
+.markdown blockquote{margin:0 0 20px;padding:.25rem 1rem;border-left:4px solid var(--border);color:var(--text-muted)}
+.markdown img{max-width:100%;border-radius:8px}
+.markdown hr{border:0;border-top:1px solid var(--border-soft);margin:2rem 0}
+.md-loading{color:var(--text-faint);padding:2rem 0}
+
 /* ---------- Footer ---------- */
 .footer{background:var(--bg);border-top:1px solid var(--border-soft);padding:2.5rem 0 2rem}
 .footer__inner{max-width:1536px;margin:0 auto;padding:0 60px}

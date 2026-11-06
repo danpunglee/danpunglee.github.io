@@ -92,8 +92,12 @@
   </div>
 </div>
 
+
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
 <script>
-/* ---------- Content ---------- */
+/* ==========================================================
+   화면 동작 (글 내용은 docs/*.md, 메뉴 순서는 docs/sidebar.json)
+   ========================================================== */
 const REPO = "https://github.com/danpunglee/danpunglee.github.io";
 const ICON = {
   note:'<svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M6.3 5.69a.942.942 0 0 1-.28-.7c0-.28.09-.52.28-.7.19-.18.42-.28.7-.28.28 0 .52.09.7.28.18.19.28.42.28.7 0 .28-.09.52-.28.7a1 1 0 0 1-.7.3c-.28 0-.52-.11-.7-.3zM8 7.99c-.02-.25-.11-.48-.31-.69-.2-.19-.42-.3-.69-.31H6c-.27.02-.48.13-.69.31-.2.2-.3.44-.31.69h1v3c.02.27.11.5.31.69.2.2.42.31.69.31h1c.27 0 .48-.11.69-.31.2-.19.3-.42.31-.69H8V7.98v.01zM7 2.3c-3.14 0-5.7 2.54-5.7 5.68 0 3.14 2.56 5.7 5.7 5.7s5.7-2.55 5.7-5.7c0-3.15-2.56-5.69-5.7-5.69v.01zM7 .98c3.86 0 7 3.14 7 7s-3.14 7-7 7-7-3.12-7-7 3.14-7 7-7z"/></svg>',
@@ -101,109 +105,47 @@ const ICON = {
   info:'<svg viewBox="0 0 14 16"><path fill-rule="evenodd" d="M7 2.3c3.14 0 5.7 2.56 5.7 5.7s-2.56 5.7-5.7 5.7A5.71 5.71 0 0 1 1.3 8c0-3.14 2.56-5.7 5.7-5.7zM7 1C3.14 1 0 4.14 0 8s3.14 7 7 7 7-3.14 7-7-3.14-7-7-7zm1 3H6v5h2V4zm0 6H6v2h2v-2z"/></svg>',
   warning:'<svg viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8.893 1.5c-.183-.31-.52-.5-.887-.5s-.703.19-.886.5L.138 13.499a.98.98 0 0 0 0 1.001c.193.31.53.501.886.501h13.964c.367 0 .704-.19.877-.5a1.03 1.03 0 0 0 .01-1.002L8.893 1.5zm.133 11.497H6.987v-2.003h2.039v2.003zm0-3.004H6.987V5.987h2.039v4.006z"/></svg>'
 };
-const adm = (type, title, body) => `<div class="admonition admonition--${type}"><div class="admonition__title">${ICON[type]}${title}</div>${body}</div>`;
+const ADM_DEFAULT = { note:"참고", tip:"팁", info:"정보", warning:"주의" };
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-const SIDEBAR = [
-  { label:"시작하기", items:["intro","site"] },
-  { label:"프로젝트", items:["projects"] },
-  { label:"노트", items:["notes"] },
-  { label:"기타", items:["contact"] }
-];
+/* ---------- Markdown → HTML ---------- */
+// :::info 제목 ... ::: 블록을 안내 박스로 바꾸고, 나머지는 marked로 변환
+function mdToHtml(md){
+  const lines = md.replace(/\r\n?/g, "\n").split("\n");
+  let out = "", buf = [], inFence = false, adm = null;
+  const flush = () => { if (buf.length){ out += marked.parse(buf.join("\n")); buf = []; } };
+  for (const line of lines){
+    if (/^\s*(```|~~~)/.test(line)) inFence = !inFence;
+    const open = !inFence && !adm && line.match(/^:::\s*(note|tip|info|warning)\s*(.*)$/);
+    if (open){ flush(); adm = { type:open[1], title:open[2].trim() || ADM_DEFAULT[open[1]] }; continue; }
+    if (!inFence && adm && /^:::\s*$/.test(line)){
+      const body = marked.parse(buf.join("\n")); buf = [];
+      out += `<div class="admonition admonition--${adm.type}"><div class="admonition__title">${ICON[adm.type]}${esc(adm.title)}</div>${body}</div>`;
+      adm = null; continue;
+    }
+    buf.push(line);
+  }
+  flush();
+  return out;
+}
+const slug = t => t.trim().toLowerCase().replace(/[^\p{L}\p{N}\s-]/gu, "").replace(/\s+/g, "-") || "section";
 
-const DOCS = {
-  intro:{ title:"소개", html:`
-<h1>danpunglee에 오신 것을 환영합니다</h1>
-<p class="lead">만들고, 기록하고, 나눕니다. 이곳은 danpunglee의 프로젝트와 기술 노트를 문서처럼 정리해 두는 공간입니다.</p>
-${adm("info","이 사이트에 대하여",`<p>이 홈페이지는 <a href="https://pages.github.com" target="_blank" rel="noopener">GitHub Pages</a>로 무료 호스팅되며, 저장소 <code>danpunglee/danpunglee.github.io</code>의 <code>index.html</code>(내용·동작)과 <code>style.css</code>(디자인) 두 파일로 운영됩니다.</p>`)}
-<h2 id="what">무엇을 볼 수 있나요</h2>
-<p>사이트는 크게 세 영역으로 나뉩니다. 왼쪽 사이드바나 아래 카드로 바로 이동할 수 있습니다.</p>
-<div class="cards">
-  <a class="card" href="#/docs/projects"><h3>📦 프로젝트</h3><p>진행 중이거나 공개한 프로젝트 목록과 상태</p></a>
-  <a class="card" href="#/docs/notes"><h3>📝 기술 노트</h3><p>작업하며 배운 것, 문제 해결 기록</p></a>
-  <a class="card" href="#/docs/site"><h3>⚙️ 사이트 운영</h3><p>이 홈페이지를 수정하고 배포하는 방법</p></a>
-  <a class="card" href="#/docs/contact"><h3>✉️ 연락처</h3><p>협업 제안이나 문의 방법</p></a>
-</div>
-<h2 id="principles">운영 원칙</h2>
-<ul>
-  <li><strong>문서처럼 정리합니다.</strong> 흩어진 메모 대신 찾기 쉬운 구조로 남깁니다.</li>
-  <li><strong>작게, 자주 갱신합니다.</strong> 완성도보다 꾸준한 기록을 우선합니다.</li>
-  <li><strong>공개를 기본으로 합니다.</strong> 공유할 수 있는 것은 공유합니다.</li>
-</ul>
-${adm("tip","빠른 탐색",`<p>어느 페이지에서든 <span class="kbd">Ctrl</span> + <span class="kbd">K</span> (Mac은 <span class="kbd">⌘</span> + <span class="kbd">K</span>)를 누르면 전체 문서를 검색할 수 있습니다.</p>`)}
-`},
-  site:{ title:"사이트 운영", html:`
-<h1>사이트 운영</h1>
-<p class="lead">이 홈페이지를 고치고 다시 배포하는 방법입니다. 별도 빌드 도구 없이 브라우저만으로 수정할 수 있습니다.</p>
-<h2 id="structure">구성</h2>
-<table>
-  <thead><tr><th>항목</th><th>내용</th></tr></thead>
-  <tbody>
-    <tr><td>주소</td><td><code>https://danpunglee.github.io</code></td></tr>
-    <tr><td>저장소</td><td><a href="${REPO}" target="_blank" rel="noopener">danpunglee/danpunglee.github.io</a></td></tr>
-    <tr><td>파일</td><td><code>index.html</code> (내용·동작), <code>style.css</code> (디자인)</td></tr>
-    <tr><td>비용</td><td>무료 (공개 저장소 + GitHub Pages)</td></tr>
-  </tbody>
-</table>
-<h2 id="edit">내용 수정하기</h2>
-<ol>
-  <li>저장소에서 <code>index.html</code>을 열고 연필 아이콘(Edit)을 누릅니다.</li>
-  <li>파일 아래쪽 <code>DOCS</code> 항목에서 원하는 페이지의 문구를 고칩니다.</li>
-  <li><strong>Commit changes</strong>를 누르면 1~2분 뒤 사이트에 반영됩니다.</li>
-</ol>
-${adm("note","새 페이지 추가",`<p><code>DOCS</code>에 새 항목을 만들고, <code>SIDEBAR</code>의 원하는 그룹에 그 이름을 넣으면 사이드바와 이전/다음 버튼이 자동으로 연결됩니다.</p>`)}
-<h3 id="name-change">이름을 바꿀 때</h3>
-<p>Organization 이름을 바꾸면 사이트 주소도 함께 바뀝니다. 이때 저장소 이름도 <code>새이름.github.io</code>로 맞춰 주어야 합니다.</p>
-${adm("warning","주의",`<p>공개 저장소이므로 비밀번호, 개인 연락처, 회사 내부 정보는 올리지 마세요.</p>`)}
-<h2 id="design">디자인 수정하기</h2>
-<p>색상, 글꼴, 여백 같은 디자인은 <a href="${REPO}/edit/main/style.css" target="_blank" rel="noopener"><code>style.css</code></a>에 모여 있습니다. 파일 맨 위 <code>:root</code>의 변수(예: <code>--link</code>, <code>--btn-bg</code>)만 바꿔도 사이트 전체에 적용됩니다. 다크 모드 색은 바로 아래 <code>[data-theme="dark"]</code>에서 바꿉니다.</p>
-`},
-  projects:{ title:"프로젝트", html:`
-<h1>프로젝트</h1>
-<p class="lead">진행 중이거나 공개한 프로젝트를 모아 둡니다. 상태 배지로 현재 단계를 확인할 수 있습니다.</p>
-<h2 id="list">목록</h2>
-<div class="cards">
-  <a class="card" href="#/docs/site"><h3>danpunglee.github.io <span class="badge badge--live">운영 중</span></h3><p>지금 보고 있는 홈페이지. 문서형 레이아웃의 개인 허브.</p></a>
-  <div class="card"><h3>다음 프로젝트 <span class="badge badge--soon">준비 중</span></h3><p>새 프로젝트가 공개되면 이곳에 추가됩니다.</p></div>
-</div>
-<h2 id="status">상태 구분</h2>
-<table>
-  <thead><tr><th>배지</th><th>의미</th></tr></thead>
-  <tbody>
-    <tr><td><span class="badge badge--live">운영 중</span></td><td>공개되어 실제로 사용할 수 있음</td></tr>
-    <tr><td><span class="badge badge--soon">준비 중</span></td><td>기획 또는 개발 단계</td></tr>
-  </tbody>
-</table>
-${adm("info","소스 코드",`<p>공개 가능한 프로젝트의 코드는 <a href="https://github.com/danpunglee" target="_blank" rel="noopener">github.com/danpunglee</a>에서 볼 수 있습니다.</p>`)}
-`},
-  notes:{ title:"기술 노트", html:`
-<h1>기술 노트</h1>
-<p class="lead">작업하면서 배운 것과 문제를 해결한 과정을 짧게 기록합니다.</p>
-${adm("note","작성 예정",`<p>첫 노트를 준비하고 있습니다. 아래 주제부터 차례로 채워 갈 예정입니다.</p>`)}
-<h2 id="topics">정리할 주제</h2>
-<ul>
-  <li>GitHub Organization과 GitHub Pages로 개인 허브 만들기</li>
-  <li>문서형(Docs) 레이아웃 설계 메모</li>
-  <li>작업 자동화와 도구 정리</li>
-</ul>
-<h2 id="format">노트 형식</h2>
-<p>각 노트는 다음 순서로 씁니다.</p>
-<ol>
-  <li><strong>문제</strong> — 무엇을 하려 했고 무엇이 막혔는지</li>
-  <li><strong>시도</strong> — 확인한 것과 결과</li>
-  <li><strong>해결</strong> — 최종 방법과 다음에 참고할 점</li>
-</ol>
-`},
-  contact:{ title:"연락처", html:`
-<h1>연락처</h1>
-<p class="lead">협업 제안, 질문, 피드백 모두 환영합니다.</p>
-<h2 id="github">GitHub</h2>
-<p>가장 빠른 방법은 GitHub입니다. <a href="https://github.com/danpunglee" target="_blank" rel="noopener">github.com/danpunglee</a>를 방문하거나, 이 사이트 저장소에 이슈를 남겨 주세요.</p>
-${adm("tip","이슈 남기기",`<p><a href="${REPO}/issues/new" target="_blank" rel="noopener">새 이슈 작성</a>에서 제목과 내용을 적으면 됩니다. GitHub 계정이 필요합니다.</p>`)}
-`}
-};
-
-const ORDER = SIDEBAR.flatMap(g => g.items);
-const groupOf = id => SIDEBAR.find(g => g.items.includes(id));
+/* ---------- Data ---------- */
+let SIDEBAR = [], ORDER = [], TITLES = {};
+const MD = {}; // id -> markdown text
+const groupOf = id => SIDEBAR.find(g => g.items.some(i => i.id === id));
+async function loadSidebar(){
+  const r = await fetch("docs/sidebar.json", { cache:"no-cache" });
+  SIDEBAR = await r.json();
+  ORDER = SIDEBAR.flatMap(g => g.items.map(i => i.id));
+  SIDEBAR.forEach(g => g.items.forEach(i => TITLES[i.id] = i.title));
+}
+async function loadDoc(id){
+  if (MD[id] !== undefined) return MD[id];
+  const r = await fetch(`docs/${encodeURIComponent(id)}.md`, { cache:"no-cache" });
+  MD[id] = r.ok ? await r.text() : null;
+  return MD[id];
+}
 const LOGO = document.querySelector(".navbar__brand svg").outerHTML;
 
 /* ---------- Theme ---------- */
@@ -245,8 +187,8 @@ let collapsedCats = new Set();
 function sidebarHTML(cur){
   return `<div class="sidebar__head"><a class="navbar__brand" href="#/">${LOGO}danpunglee</a><button class="sq-btn" id="sbClose" aria-label="메뉴 닫기"><svg viewBox="0 0 24 24"><path stroke="currentColor" stroke-width="2" stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg></button></div>
 <div class="sidebar__menu"><ul class="menu__list">${SIDEBAR.map(g => `
-  <li class="menu__item${collapsedCats.has(g.label) ? " collapsed" : ""}"><button class="menu__cat" data-cat="${g.label}">${g.label}</button>
-    <ul class="menu__list">${g.items.map(id => `<li class="menu__item"><a class="menu__link${id===cur?" active":""}" href="#/docs/${id}">${DOCS[id].title}</a></li>`).join("")}</ul>
+  <li class="menu__item${collapsedCats.has(g.label) ? " collapsed" : ""}"><button class="menu__cat" data-cat="${esc(g.label)}">${esc(g.label)}</button>
+    <ul class="menu__list">${g.items.map(i => `<li class="menu__item"><a class="menu__link${i.id===cur?" active":""}" href="#/docs/${i.id}">${esc(i.title)}</a></li>`).join("")}</ul>
   </li>`).join("")}
 </ul></div>
 <button class="sidebar__collapse" id="sbCollapse" aria-label="사이드바 접기" title="사이드바 접기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m11 17-5-5 5-5M18 17l-5-5 5-5"/></svg></button>`;
@@ -258,15 +200,16 @@ function tocHTML(heads){
   heads.forEach(h => {
     if (h.level === 3 && !inSub){ html = html.replace(/<\/li>$/, "") + "<ul>"; inSub = true; }
     else if (h.level === 2 && inSub){ html += "</ul></li>"; inSub = false; }
-    html += `<li><a href="#" data-target="${h.id}">${h.text}</a></li>`;
+    html += `<li><a href="#" data-target="${h.id}">${esc(h.text)}</a></li>`;
   });
   if (inSub) html += "</ul></li>";
   return html + "</ul>";
 }
 
-let sbHidden = false;
-function renderDoc(id){
-  const doc = DOCS[id]; if (!doc) return renderNotFound();
+let sbHidden = false, renderSeq = 0;
+async function renderDoc(id){
+  const seq = ++renderSeq;
+  if (!ORDER.includes(id)) { const md = await loadDoc(id); if (md == null) return renderNotFound(); }
   const g = groupOf(id), i = ORDER.indexOf(id), prev = ORDER[i-1], next = ORDER[i+1];
   app.innerHTML = `
 <div class="docs${sbHidden ? " sb-hidden" : ""}" id="docs">
@@ -275,46 +218,22 @@ function renderDoc(id){
   <main class="main"><div class="doc">
     <div class="doc__col">
       <nav aria-label="Breadcrumbs"><ul class="breadcrumbs">
-        <li><a href="#/docs/${g.items[0]}">${g.label}</a></li>
-        <li><span>${doc.title}</span></li>
+        ${g ? `<li><a href="#/docs/${g.items[0].id}">${esc(g.label)}</a></li>` : ""}
+        <li><span>${esc(TITLES[id] || id)}</span></li>
       </ul></nav>
       <details class="toc-mobile"><summary>이 페이지의 내용</summary><div class="toc" id="tocMobile"></div></details>
-      <article class="markdown" id="article">${doc.html}</article>
+      <article class="markdown" id="article"><p class="md-loading">불러오는 중…</p></article>
       <div class="doc-footer">
-        <a href="${REPO}/edit/main/index.html" target="_blank" rel="noopener"><svg viewBox="0 0 40 40"><path d="m34.5 11.7-3 3.1-6.3-6.3 3.1-3q.5-.5 1.2-.5t1.1.5l3.9 3.9q.5.4.5 1.1t-.5 1.2zm-29.5 17.1 18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"/></svg>이 페이지 수정하기</a>
+        <a href="${REPO}/edit/main/docs/${id}.md" target="_blank" rel="noopener"><svg viewBox="0 0 40 40"><path d="m34.5 11.7-3 3.1-6.3-6.3 3.1-3q.5-.5 1.2-.5t1.1.5l3.9 3.9q.5.4.5 1.1t-.5 1.2zm-29.5 17.1 18.4-18.5 6.3 6.3-18.4 18.4h-6.3v-6.2z"/></svg>이 페이지 수정하기</a>
       </div>
       <nav class="pagination-nav" aria-label="문서 페이지">
-        ${prev ? `<a class="pagination-nav__link pagination-nav__link--prev" href="#/docs/${prev}"><span class="pagination-nav__sub">이전</span><span class="pagination-nav__label">${DOCS[prev].title}</span></a>` : ""}
-        ${next ? `<a class="pagination-nav__link pagination-nav__link--next" href="#/docs/${next}"><span class="pagination-nav__sub">다음</span><span class="pagination-nav__label">${DOCS[next].title}</span></a>` : ""}
+        ${prev ? `<a class="pagination-nav__link pagination-nav__link--prev" href="#/docs/${prev}"><span class="pagination-nav__sub">이전</span><span class="pagination-nav__label">${esc(TITLES[prev])}</span></a>` : ""}
+        ${next ? `<a class="pagination-nav__link pagination-nav__link--next" href="#/docs/${next}"><span class="pagination-nav__sub">다음</span><span class="pagination-nav__label">${esc(TITLES[next])}</span></a>` : ""}
       </nav>
     </div>
     <div class="toc-col"><div class="toc" id="toc"></div></div>
   </div></main>
 </div>`;
-  // title row + copy button
-  const article = document.getElementById("article"), h1 = article.querySelector("h1");
-  if (h1){
-    const head = document.createElement("div"); head.className = "doc__head";
-    h1.replaceWith(head); head.appendChild(h1);
-    head.insertAdjacentHTML("beforeend", `<div class="copy-btn"><button id="copyPage"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>본문 복사</span></button><a href="${REPO}/blob/main/index.html" target="_blank" rel="noopener" aria-label="소스 보기" title="소스 보기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></a></div>`);
-    document.getElementById("copyPage").onclick = async e => {
-      const lab = e.currentTarget.querySelector("span");
-      try { await navigator.clipboard.writeText(article.innerText.replace(/^본문 복사\s*/m, "")); lab.textContent = "복사됨"; }
-      catch(err){ lab.textContent = "복사 실패"; }
-      setTimeout(() => lab.textContent = "본문 복사", 1500);
-    };
-  }
-  // headings + anchors
-  const heads = [...document.querySelectorAll("#article h2[id], #article h3[id]")].map(h => {
-    const a = document.createElement("a"); a.className = "heading-anchor"; a.href = "#"; a.textContent = "#"; a.dataset.target = h.id; a.setAttribute("aria-label", "링크");
-    const text = h.textContent; h.appendChild(a);
-    return { id:h.id, text:text.replace(/<[^>]+>/g,""), level:+h.tagName[1] };
-  });
-  const toc = tocHTML(heads);
-  document.getElementById("toc").innerHTML = toc;
-  document.getElementById("tocMobile").innerHTML = toc;
-  if (!heads.length) document.querySelector(".toc-mobile").style.display = "none";
-  // collapsible categories
   document.querySelectorAll(".menu__cat").forEach(b => b.onclick = () => {
     const li = b.parentElement; li.classList.toggle("collapsed");
     li.classList.contains("collapsed") ? collapsedCats.add(b.dataset.cat) : collapsedCats.delete(b.dataset.cat);
@@ -323,7 +242,49 @@ function renderDoc(id){
   document.getElementById("sbClose").onclick = closeSidebar;
   document.getElementById("backdrop").onclick = closeSidebar;
   setActiveNav(id);
-  document.title = `${doc.title} | danpunglee`;
+  document.title = `${TITLES[id] || id} | danpunglee`;
+
+  const md = await loadDoc(id);
+  if (seq !== renderSeq) return;
+  const article = document.getElementById("article");
+  if (md == null){ article.innerHTML = `<h1>페이지를 찾을 수 없습니다</h1><p><code>docs/${esc(id)}.md</code> 파일이 없습니다.</p>`; return; }
+  article.innerHTML = mdToHtml(md);
+
+  // 외부 링크는 새 탭으로
+  article.querySelectorAll('a[href^="http"]').forEach(a => { a.target = "_blank"; a.rel = "noopener"; });
+  // 제목 다음 첫 문단은 리드 문장
+  const h1 = article.querySelector("h1");
+  if (h1 && h1.nextElementSibling?.tagName === "P") h1.nextElementSibling.classList.add("lead");
+  if (h1 && !TITLES[id]) document.title = `${h1.textContent} | danpunglee`;
+  // 제목 줄 + 본문 복사 버튼
+  if (h1){
+    const head = document.createElement("div"); head.className = "doc__head";
+    h1.replaceWith(head); head.appendChild(h1);
+    head.insertAdjacentHTML("beforeend", `<div class="copy-btn"><button id="copyPage" title="마크다운 원문 복사"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg><span>본문 복사</span></button><a href="${REPO}/blob/main/docs/${id}.md" target="_blank" rel="noopener" aria-label="원문 보기" title="원문 보기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></a></div>`);
+    document.getElementById("copyPage").onclick = async e => {
+      const lab = e.currentTarget.querySelector("span");
+      try { await navigator.clipboard.writeText(md); lab.textContent = "복사됨"; }
+      catch(err){ lab.textContent = "복사 실패"; }
+      setTimeout(() => lab.textContent = "본문 복사", 1500);
+    };
+  }
+  // 제목 id ({#id} 지원) + 앵커 + 목차
+  const used = new Set();
+  const heads = [...article.querySelectorAll("h2, h3")].filter(h => !h.closest(".card, .admonition")).map(h => {
+    let text = h.textContent, id2;
+    const m = text.match(/\s*\{#([\w-]+)\}\s*$/);
+    if (m){ id2 = m[1]; text = text.slice(0, m.index); h.innerHTML = h.innerHTML.replace(/\s*\{#[\w-]+\}\s*$/, ""); }
+    id2 = id2 || slug(text);
+    let base = id2, n = 1; while (used.has(id2)) id2 = `${base}-${n++}`; used.add(id2);
+    h.id = id2;
+    const a = document.createElement("a"); a.className = "heading-anchor"; a.href = "#"; a.textContent = "#"; a.dataset.target = id2; a.setAttribute("aria-label", "링크");
+    h.appendChild(a);
+    return { id:id2, text:text.trim(), level:+h.tagName[1] };
+  });
+  const toc = tocHTML(heads);
+  document.getElementById("toc").innerHTML = toc;
+  document.getElementById("tocMobile").innerHTML = toc;
+  if (!heads.length) document.querySelector(".toc-mobile").style.display = "none";
   spy();
 }
 
@@ -372,14 +333,22 @@ addEventListener("scroll", () => requestAnimationFrame(spy), { passive:true });
 /* mobile sidebar */
 function closeSidebar(){ document.getElementById("sidebar")?.classList.remove("open"); document.getElementById("backdrop")?.classList.remove("open"); }
 document.getElementById("menuToggle").onclick = () => {
-  if (!document.getElementById("sidebar")) { location.hash = "#/docs/intro"; setTimeout(openSidebar, 50); return; }
+  if (!document.getElementById("sidebar")) { location.hash = "#/docs/intro"; setTimeout(openSidebar, 300); return; }
   openSidebar();
 };
 function openSidebar(){ document.getElementById("sidebar")?.classList.add("open"); document.getElementById("backdrop")?.classList.add("open"); }
 
-/* ---------- Search ---------- */
+/* ---------- Search (모든 .md를 불러와 검색) ---------- */
 const modal = document.getElementById("searchModal"), input = document.getElementById("searchInput"), results = document.getElementById("searchResults");
-const INDEX = ORDER.map(id => { const d = document.createElement("div"); d.innerHTML = DOCS[id].html; return { id, title:DOCS[id].title, group:groupOf(id).label, text:d.textContent.replace(/\s+/g," ") }; });
+let INDEX = [];
+async function buildIndex(){
+  await Promise.all(ORDER.map(loadDoc));
+  INDEX = ORDER.filter(id => MD[id] != null).map(id => {
+    const d = document.createElement("div"); d.innerHTML = mdToHtml(MD[id]);
+    return { id, title:TITLES[id], group:groupOf(id).label, text:d.textContent.replace(/\{#[\w-]+\}/g, "").replace(/\s+/g, " ") };
+  });
+  if (modal.classList.contains("open")) doSearch();
+}
 let sel = 0;
 function openSearch(){ modal.classList.add("open"); input.value = ""; doSearch(); setTimeout(() => input.focus(), 0); }
 function closeSearch(){ modal.classList.remove("open"); }
@@ -387,11 +356,12 @@ function doSearch(){
   const q = input.value.trim().toLowerCase();
   const list = q ? INDEX.filter(x => (x.title + " " + x.text).toLowerCase().includes(q)) : INDEX;
   sel = 0;
-  if (!list.length){ results.innerHTML = `<li class="search-empty">"${input.value.replace(/[<>&"]/g,"")}"에 대한 결과가 없습니다</li>`; return; }
+  if (!INDEX.length){ results.innerHTML = `<li class="search-empty">문서를 불러오는 중…</li>`; return; }
+  if (!list.length){ results.innerHTML = `<li class="search-empty">"${esc(input.value)}"에 대한 결과가 없습니다</li>`; return; }
   results.innerHTML = list.map((x, i) => {
     let snip = x.text.slice(0, 70);
     if (q){ const p = x.text.toLowerCase().indexOf(q); if (p > -1) snip = (p > 20 ? "…" : "") + x.text.slice(Math.max(0, p-20), p+50); }
-    return `<li><a href="#/docs/${x.id}" class="${i===0?"sel":""}">${x.group} › <strong>${x.title}</strong><small>${snip.replace(/[<>&]/g,"")}</small></a></li>`;
+    return `<li><a href="#/docs/${x.id}" class="${i===0?"sel":""}">${esc(x.group)} › <strong>${esc(x.title)}</strong><small>${esc(snip)}</small></a></li>`;
   }).join("");
 }
 function move(d){ const as = [...results.querySelectorAll("a")]; if (!as.length) return; as[sel].classList.remove("sel"); sel = (sel + d + as.length) % as.length; as[sel].classList.add("sel"); as[sel].scrollIntoView({ block:"nearest" }); }
@@ -411,7 +381,11 @@ addEventListener("keydown", e => {
 if (/Mac|iPhone|iPad/.test(navigator.platform)) document.getElementById("modKey").textContent = "⌘";
 
 document.getElementById("year").textContent = new Date().getFullYear();
-route();
+
+/* ---------- Start ---------- */
+loadSidebar()
+  .then(() => { route(); buildIndex(); })
+  .catch(err => { app.innerHTML = `<main class="home"><h1>메뉴를 불러오지 못했습니다</h1><p><code>docs/sidebar.json</code> 형식을 확인해 주세요. (${esc(err.message)})</p></main>`; });
 </script>
 </body>
 </html>
