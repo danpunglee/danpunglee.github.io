@@ -166,11 +166,18 @@ const FEATURE_ICON = [
 ];
 
 function renderHome(){
-  // 메인 페이지: 저장소 루트의 dog.jpg 를 화면 가운데에 표시
-  app.innerHTML = `<main class="photo"><img src="dog.jpg" alt="강아지 사진"></main>`;
-  app.querySelector(".photo img").onerror = e => { e.target.outerHTML = '<p class="photo__empty">강아지 사진 준비 중</p>'; };
+  // 메인 페이지: 대문 사진 + 인사말 + 하단 사진 2장
+  app.innerHTML = `
+<main class="photo">
+  <img class="photo__hero" src="dog.jpg" alt="단풍이 대문 사진">
+  <h1 class="photo__hello">안녕하세요. 단풍이에요.</h1>
+  <div class="photo__row">
+    <img src="dog-left.jpg" alt="웃고 있는 단풍이" loading="lazy">
+    <img src="dog-right.jpg" alt="고개를 갸웃한 단풍이" loading="lazy">
+  </div>
+</main>`;
   setActiveNav(null);
-  document.title = "danpunglee";
+  document.title = "단풍이 | danpunglee";
 }
 
 let collapsedCats = new Set();
