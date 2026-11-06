@@ -275,12 +275,13 @@ a.card:hover{border-color:var(--border-input);text-decoration:none;box-shadow:0 
   .pagination-nav__link--next{grid-column:1}
 }
 
-/* ===== 메뉴 숨김: 상단은 로고만 표시, 사이드바 · 푸터 숨김 ===== */
+/* ===== 메뉴: 상단은 로고만, 왼쪽 사이드바로 이동 (모바일은 ☰ 버튼) · 푸터는 하단 줄(저작권 · 다크 모드)만 ===== */
 :root{--nav-h:68px}
-.navbar__row--sub,.navbar__center,.navbar .sq-btn,.navbar .cta,.menu-toggle,
-.sidebar,.backdrop,.footer{display:none !important}
-.docs{padding:0 !important}
-.main{padding:1rem 24px 0 !important}
+.navbar__row--sub,.navbar__center,.navbar .sq-btn,.navbar .cta,.navbar__links,.footer__cols{display:none !important}
+.footer{padding:1.25rem 0}
+.footer__bottom{margin-top:0}
+.footer__bottom .navbar__brand{white-space:nowrap}
+@media (max-width:480px){.footer__bottom .navbar__brand{display:none}}
 @media (max-width:996px){:root{--nav-h:64px}}
 
 /* ===== 상단 메뉴: 소개 · 프로젝트 ===== */
@@ -298,5 +299,7 @@ a.card:hover{border-color:var(--border-input);text-decoration:none;box-shadow:0 
 .shots img{display:block;width:100%;border-radius:16px;border:1px solid var(--border-soft)}
 @media (max-width:600px){.shots{gap:8px}.shots img{border-radius:10px}}
 
-/* ===== 프로젝트 페이지: 목록 아래(수정 링크·이전/다음) 숨김 ===== */
-.docs[data-doc="projects"] .doc-footer,.docs[data-doc="projects"] .pagination-nav{display:none}
+/* ===== 소개 · 프로젝트 페이지: 수정 링크 · 이전/다음 숨김 ===== */
+.docs[data-doc="projects"] .doc-footer,.docs[data-doc="projects"] .pagination-nav,
+.docs[data-doc="intro"] .doc-footer,.docs[data-doc="intro"] .pagination-nav{display:none}
+.docs[data-doc="projects"] .cards{grid-template-columns:1fr}
