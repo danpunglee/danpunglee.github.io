@@ -275,19 +275,19 @@ a.card:hover{border-color:var(--border-input);text-decoration:none;box-shadow:0 
   .pagination-nav__link--next{grid-column:1}
 }
 
-/* ===== 메뉴 숨김 (사이드바 · 푸터) — 상단 메뉴는 표시 ===== */
-.footer{display:none !important}
-@media (min-width:997px){
-  .sidebar,.backdrop{display:none !important}
-  .docs{padding:0 !important}
-  .main{padding:1rem 24px 0 !important}
-}
+/* ===== 메뉴 숨김: 상단은 로고만 표시, 사이드바 · 푸터 숨김 ===== */
+:root{--nav-h:68px}
+.navbar__row--sub,.navbar__center,.navbar .sq-btn,.navbar .cta,.menu-toggle,
+.sidebar,.backdrop,.footer{display:none !important}
+.docs{padding:0 !important}
+.main{padding:1rem 24px 0 !important}
+@media (max-width:996px){:root{--nav-h:64px}}
 
 /* ===== 메인: 단풍이 사진 ===== */
-.photo{max-width:760px;margin:0 auto;padding:40px 16px 64px;display:flex;flex-direction:column;align-items:center}
+.photo{max-width:760px;margin:0 auto;padding:24px 16px 64px;display:flex;flex-direction:column;align-items:center}
 .photo img{display:block;width:100%;height:auto;border-radius:16px;object-fit:cover}
 .photo__hero{max-height:80vh;object-fit:cover}
-.photo__hello{margin:1.75rem 0 2rem;font-size:2rem;font-weight:700;letter-spacing:-.02em;color:var(--text-strong);text-align:center}
-.photo__row{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%}
+.photo__hello{margin:0 0 1.5rem;font-size:2rem;font-weight:700;letter-spacing:-.02em;color:var(--text-strong);text-align:center}
+.photo__row{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;margin-top:16px}
 .photo__row img{aspect-ratio:3/4}
 @media (max-width:480px){.photo__hello{font-size:1.5rem}.photo__row{gap:10px}}
