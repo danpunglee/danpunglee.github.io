@@ -283,11 +283,17 @@ a.card:hover{border-color:var(--border-input);text-decoration:none;box-shadow:0 
 .main{padding:1rem 24px 0 !important}
 @media (max-width:996px){:root{--nav-h:64px}}
 
-/* ===== 메인: 단풍이 사진 ===== */
-.photo{max-width:760px;margin:0 auto;padding:24px 16px 64px;display:flex;flex-direction:column;align-items:center}
-.photo img{display:block;width:100%;height:auto;border-radius:16px;object-fit:cover}
-.photo__hero{max-height:80vh;object-fit:cover}
-.photo__hello{margin:0 0 1.5rem;font-size:2rem;font-weight:700;letter-spacing:-.02em;color:var(--text-strong);text-align:center}
-.photo__row{display:grid;grid-template-columns:1fr 1fr;gap:16px;width:100%;margin-top:16px}
-.photo__row img{aspect-ratio:3/4}
-@media (max-width:480px){.photo__hello{font-size:1.5rem}.photo__row{gap:10px}}
+/* ===== 상단 메뉴: 소개 · 프로젝트 ===== */
+.navbar__links{display:flex;gap:4px;margin-left:1.25rem}
+@media (max-width:480px){.navbar__links{margin-left:auto}.navbar__links .navbar__link{padding:8px 10px}}
+
+/* ===== 소개: 단풍이 사진 ===== */
+.dog-gallery{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:1.5rem 0 2rem}
+.dog-gallery img{display:block;width:100%;height:100%;border-radius:16px;object-fit:cover;aspect-ratio:3/4}
+.dog-gallery .dog-gallery__hero{grid-column:1 / -1;aspect-ratio:auto;max-height:80vh}
+@media (max-width:480px){.dog-gallery{gap:10px}}
+
+/* ===== 프로젝트 스크린샷 ===== */
+.shots{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:1.5rem 0 2rem}
+.shots img{display:block;width:100%;border-radius:16px;border:1px solid var(--border-soft)}
+@media (max-width:600px){.shots{gap:8px}.shots img{border-radius:10px}}
