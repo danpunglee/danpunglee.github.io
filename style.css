@@ -13,7 +13,7 @@
    ========================================================== */
 /* ---------- Tokens ---------- */
 :root{
-  --bg:#ffffff; --bg-nav:#ffffff; --bg-subtle:#f8f9fc; --bg-hover:#f1f2f8; --bg-active:#e0e3f2;
+  --bg:#fff6ef; --bg-nav:#fff6ef; --bg-subtle:#f8f9fc; --bg-hover:#f1f2f8; --bg-active:#e0e3f2;
   --text:#242736; --text-strong:#242836; --text-muted:#3f475d; --text-faint:#6e758a;
   --border:#dadde1; --border-soft:#e7e9f0; --border-input:#d0d5e9;
   --link:#1471eb; --btn-bg:#242736; --btn-text:#ffffff;
