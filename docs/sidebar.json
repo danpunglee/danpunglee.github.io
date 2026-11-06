@@ -2,8 +2,7 @@
   {
     "label": "시작하기",
     "items": [
-      { "id": "intro", "title": "소개" },
-      { "id": "site", "title": "사이트 운영" }
+      { "id": "intro", "title": "소개" }
     ]
   },
   {
@@ -11,18 +10,6 @@
     "items": [
       { "id": "projects", "title": "프로젝트" },
       { "id": "slimon", "title": "SLIMON" }
-    ]
-  },
-  {
-    "label": "노트",
-    "items": [
-      { "id": "notes", "title": "기술 노트" }
-    ]
-  },
-  {
-    "label": "기타",
-    "items": [
-      { "id": "contact", "title": "연락처" }
     ]
   }
 ]
